@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Comparator;
 
 public class EmpMenuHandler {
 
@@ -35,10 +36,11 @@ public class EmpMenuHandler {
 			System.out.println("6. SEARCH EMPLOYEE");
 			System.out.println("7. VIEW DEPARTMENT WISE LIST");
 			System.out.println("8. COUNT EMPLOYEES WHOSE SALARY IS GREATER THAN ___");
-			System.out.println("9. EXIT");
+			System.out.println("9. VIEW SORTED EMPLOYEES ");
+			System.out.println("10. EXIT");
 
 			int input = Integer.parseInt(reader.readLine());
-			if (input == 9)
+			if (input == 10)
 				System.exit(0);
 
 			switch (input) {
@@ -77,17 +79,8 @@ public class EmpMenuHandler {
 			case 2:
 				// using PreparedStatement and result set to display emp
 				PreparedStatement psShow = con.prepareStatement("select *from emp");
-				ResultSet resultSet = psShow.executeQuery();
+				displayEmp(psShow);
 
-				while (resultSet.next()) {
-					int eno1 = resultSet.getInt(1);
-					String ename1 = resultSet.getString(2);
-					long salary1 = resultSet.getLong(3);
-					String designation1 = resultSet.getString(4);
-					String dept1 = resultSet.getString(5);
-					Emp emp1 = new Emp(eno1, ename1, salary1, designation1, dept1);
-					System.out.println(emp1);
-				}
 				break;
 
 			case 3:
@@ -150,22 +143,13 @@ public class EmpMenuHandler {
 				// using PreparedStatement to display employee with same department
 				System.out.println("ENTER DEPARTMENT NAME ");
 				String dept5 = reader.readLine().trim();
-				PreparedStatement psDept = con
-						.prepareStatement("select eno,ename,salary,designation from emp where dept=?");
+				PreparedStatement psDept = con.prepareStatement("select * from emp where dept=?");
 				psDept.setString(1, dept5);
-				ResultSet rsDept = psDept.executeQuery();
-				while (rsDept.next()) {
-					int eno5 = rsDept.getInt(1);
-					String ename5 = rsDept.getString(2);
-					long salary5 = rsDept.getLong(3);
-					String designation5 = rsDept.getString(4);
-
-					Emp emp5 = new Emp(eno5, ename5, salary5, designation5, dept5);
-					System.out.println(emp5);
-				}
+				displayEmp(psDept);
 				break;
 
 			case 8:
+				//using function getSalCount()
 				System.out.println("ENTER SALARY");
 				long salary6 = Long.parseLong(reader.readLine());
 				CallableStatement csSalCount = con.prepareCall("{?=call getSalCount(?)}");
@@ -176,9 +160,87 @@ public class EmpMenuHandler {
 				System.out.println(count);
 				break;
 
+			case 9:
+				// sorting emp using different field name
+				System.out.println("SORT BY");
+				System.out.println("1. EMPLOYEE ID");
+				System.out.println("2. EMPLOYEE NAME");
+				System.out.println("3. EMPLOYEE SALARY");
+				System.out.println("4. EMPLOYEE DESIGNATION");
+				System.out.println("5. EMPLOYEE DEPT");
+				int type = Integer.parseInt(reader.readLine());
+				System.out.println("ORDER TYPE(ASC OR DESC)");
+				String order = reader.readLine().trim();
+				int flag = 0;// default is ascending
+				if (order.equals("desc"))
+					flag = 1;
+				else if (order.equals("asc") || order.equals(""))
+					flag = 0;
+
+				switch (type) {
+
+				case 1:
+
+					if (flag == 1) {
+
+						PreparedStatement psSortEnoDesc = con.prepareStatement("select *from emp order by eno desc");
+						displayEmp(psSortEnoDesc);
+					} else {
+						PreparedStatement psSortEno = con.prepareStatement("select *from emp order by eno");
+						displayEmp(psSortEno);
+					}
+					break;
+
+				case 2:
+
+					if (flag == 1) {
+						PreparedStatement psSortEnameDesc = con
+								.prepareStatement("select *from emp order by ename desc");
+						displayEmp(psSortEnameDesc);
+					} else {
+						PreparedStatement psSortEname = con.prepareStatement("select *from emp order by ename");
+						displayEmp(psSortEname);
+					}
+					break;
+
+				case 3:
+					if (flag == 1) {
+						PreparedStatement psSortSalDesc = con.prepareStatement("select *from emp order by salary desc");
+						displayEmp(psSortSalDesc);
+					} else {
+						PreparedStatement psSortSal = con.prepareStatement("select *from emp order by salary");
+						displayEmp(psSortSal);
+					}
+					break;
+
+				case 4:
+					if (flag == 1) {
+						PreparedStatement psSortDesgDesc = con
+								.prepareStatement("select *from emp order by designation desc");
+						displayEmp(psSortDesgDesc);
+					} else {
+						PreparedStatement psSortDesg = con.prepareStatement("select *from emp order by designation");
+						displayEmp(psSortDesg);
+					}
+					break;
+
+				case 5:
+					if (flag == 1) {
+						PreparedStatement psSortDeptDesc = con.prepareStatement("select *from emp order by dept desc");
+						displayEmp(psSortDeptDesc);
+					} else {
+						PreparedStatement psSortDept = con.prepareStatement("select *from emp order by dept");
+						displayEmp(psSortDept);
+					}
+					break;
+
+				default:
+					PreparedStatement psSortDefault = con.prepareStatement("select *from emp order by eno");
+					displayEmp(psSortDefault);
+
+				}
 			default:
 				System.out.println("CHOOSE CORRECT OPTION");
-				break;
 
 			}
 
@@ -187,4 +249,16 @@ public class EmpMenuHandler {
 		con.close();
 	}
 
+	public static void displayEmp(PreparedStatement ps) throws SQLException {
+		ResultSet resultSet = ps.executeQuery();
+		while (resultSet.next()) {
+			int eno = resultSet.getInt(1);
+			String ename = resultSet.getString(2);
+			long salary = resultSet.getLong(3);
+			String designation = resultSet.getString(4);
+			String dept = resultSet.getString(5);
+			Emp emp1 = new Emp(eno, ename, salary, designation, dept);
+			System.out.println(emp1);
+		}
+	}
 }
