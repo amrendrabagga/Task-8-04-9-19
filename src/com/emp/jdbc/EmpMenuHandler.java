@@ -182,7 +182,6 @@ public class EmpMenuHandler {
 				case 1:
 
 					if (flag == 1) {
-
 						PreparedStatement psSortEnoDesc = con.prepareStatement("select *from emp order by eno desc");
 						displayEmp(psSortEnoDesc);
 					} else {
@@ -194,8 +193,7 @@ public class EmpMenuHandler {
 				case 2:
 
 					if (flag == 1) {
-						PreparedStatement psSortEnameDesc = con
-								.prepareStatement("select *from emp order by ename desc");
+						PreparedStatement psSortEnameDesc = con.prepareStatement("select *from emp order by ename desc");
 						displayEmp(psSortEnameDesc);
 					} else {
 						PreparedStatement psSortEname = con.prepareStatement("select *from emp order by ename");
@@ -204,6 +202,7 @@ public class EmpMenuHandler {
 					break;
 
 				case 3:
+					
 					if (flag == 1) {
 						PreparedStatement psSortSalDesc = con.prepareStatement("select *from emp order by salary desc");
 						displayEmp(psSortSalDesc);
@@ -214,9 +213,9 @@ public class EmpMenuHandler {
 					break;
 
 				case 4:
+					
 					if (flag == 1) {
-						PreparedStatement psSortDesgDesc = con
-								.prepareStatement("select *from emp order by designation desc");
+						PreparedStatement psSortDesgDesc = con.prepareStatement("select *from emp order by designation desc");
 						displayEmp(psSortDesgDesc);
 					} else {
 						PreparedStatement psSortDesg = con.prepareStatement("select *from emp order by designation");
@@ -225,6 +224,7 @@ public class EmpMenuHandler {
 					break;
 
 				case 5:
+					
 					if (flag == 1) {
 						PreparedStatement psSortDeptDesc = con.prepareStatement("select *from emp order by dept desc");
 						displayEmp(psSortDeptDesc);
