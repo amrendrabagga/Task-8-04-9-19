@@ -5,16 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.Comparator;
+
 
 public class EmpMenuHandler {
 
+	
 	public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -22,7 +21,7 @@ public class EmpMenuHandler {
 
 		// establishing jdbc connectivity
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wp", "root", "root123@");
+		Connection con = DatabaseConnection.getDatabaseConnection();
 
 		while (i != 0) {
 
@@ -79,7 +78,7 @@ public class EmpMenuHandler {
 			case 2:
 				// using PreparedStatement and result set to display emp
 				PreparedStatement psShow = con.prepareStatement("select *from emp");
-				displayEmp(psShow);
+				DisplayEmp.displayEmp(psShow);
 
 				break;
 
@@ -145,7 +144,7 @@ public class EmpMenuHandler {
 				String dept5 = reader.readLine().trim();
 				PreparedStatement psDept = con.prepareStatement("select * from emp where dept=?");
 				psDept.setString(1, dept5);
-				displayEmp(psDept);
+				DisplayEmp.displayEmp(psDept);
 				break;
 
 			case 8:
@@ -162,83 +161,7 @@ public class EmpMenuHandler {
 
 			case 9:
 				// sorting emp using different field name
-				System.out.println("SORT BY");
-				System.out.println("1. EMPLOYEE ID");
-				System.out.println("2. EMPLOYEE NAME");
-				System.out.println("3. EMPLOYEE SALARY");
-				System.out.println("4. EMPLOYEE DESIGNATION");
-				System.out.println("5. EMPLOYEE DEPT");
-				int type = Integer.parseInt(reader.readLine());
-				System.out.println("ORDER TYPE(ASC OR DESC)");
-				String order = reader.readLine().trim();
-				int flag = 0;// default is ascending
-				if (order.equals("desc"))
-					flag = 1;
-				else if (order.equals("asc") || order.equals(""))
-					flag = 0;
-
-				switch (type) {
-
-				case 1:
-
-					if (flag == 1) {
-						PreparedStatement psSortEnoDesc = con.prepareStatement("select *from emp order by eno desc");
-						displayEmp(psSortEnoDesc);
-					} else {
-						PreparedStatement psSortEno = con.prepareStatement("select *from emp order by eno");
-						displayEmp(psSortEno);
-					}
-					break;
-
-				case 2:
-
-					if (flag == 1) {
-						PreparedStatement psSortEnameDesc = con.prepareStatement("select *from emp order by ename desc");
-						displayEmp(psSortEnameDesc);
-					} else {
-						PreparedStatement psSortEname = con.prepareStatement("select *from emp order by ename");
-						displayEmp(psSortEname);
-					}
-					break;
-
-				case 3:
-					
-					if (flag == 1) {
-						PreparedStatement psSortSalDesc = con.prepareStatement("select *from emp order by salary desc");
-						displayEmp(psSortSalDesc);
-					} else {
-						PreparedStatement psSortSal = con.prepareStatement("select *from emp order by salary");
-						displayEmp(psSortSal);
-					}
-					break;
-
-				case 4:
-					
-					if (flag == 1) {
-						PreparedStatement psSortDesgDesc = con.prepareStatement("select *from emp order by designation desc");
-						displayEmp(psSortDesgDesc);
-					} else {
-						PreparedStatement psSortDesg = con.prepareStatement("select *from emp order by designation");
-						displayEmp(psSortDesg);
-					}
-					break;
-
-				case 5:
-					
-					if (flag == 1) {
-						PreparedStatement psSortDeptDesc = con.prepareStatement("select *from emp order by dept desc");
-						displayEmp(psSortDeptDesc);
-					} else {
-						PreparedStatement psSortDept = con.prepareStatement("select *from emp order by dept");
-						displayEmp(psSortDept);
-					}
-					break;
-
-				default:
-					PreparedStatement psSortDefault = con.prepareStatement("select *from emp order by eno");
-					displayEmp(psSortDefault);
-
-				}
+				EmpSort.empSort(con,reader);
 			default:
 				System.out.println("CHOOSE CORRECT OPTION");
 
@@ -249,16 +172,5 @@ public class EmpMenuHandler {
 		con.close();
 	}
 
-	public static void displayEmp(PreparedStatement ps) throws SQLException {
-		ResultSet resultSet = ps.executeQuery();
-		while (resultSet.next()) {
-			int eno = resultSet.getInt(1);
-			String ename = resultSet.getString(2);
-			long salary = resultSet.getLong(3);
-			String designation = resultSet.getString(4);
-			String dept = resultSet.getString(5);
-			Emp emp1 = new Emp(eno, ename, salary, designation, dept);
-			System.out.println(emp1);
-		}
-	}
+	
 }
